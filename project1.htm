@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MySocial</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+transition:0.4s;
+}
+
+/* HEADER */
+
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 30px;
+background:linear-gradient(90deg,#667eea,#764ba2);
+color:white;
+}
+
+/* NAV */
+
+nav a{
+color:white;
+margin:0 10px;
+text-decoration:none;
+font-weight:bold;
+transition:0.3s;
+}
+
+nav a:hover{
+color:yellow;
+}
+
+/* LAYOUT */
+
+.container{
+display:grid;
+grid-template-columns:1fr 2fr 1fr;
+gap:20px;
+padding:20px;
+max-width:1200px;
+margin:auto;
+}
+
+/* PROFILE */
+
+.profile{
+background:white;
+padding:20px;
+border-radius:15px;
+text-align:center;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+}
+
+.profile img{
+width:90px;
+border-radius:50%;
+}
+
+/* STORIES */
+
+.stories{
+background:white;
+padding:20px;
+border-radius:15px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+}
+
+.story{
+background:linear-gradient(45deg,#ff758c,#ff7eb3);
+color:white;
+padding:10px;
+margin:8px 0;
+border-radius:10px;
+text-align:center;
+transition:0.3s;
+}
+
+.story:hover{
+transform:scale(1.08);
+}
+
+/* FEED */
+
+.post{
+background:white;
+padding:15px;
+margin-bottom:20px;
+border-radius:15px;
+box-shadow:0 5px 20px rgba(0,0,0,0.2);
+animation:fade 0.5s ease;
+}
+
+.post img{
+width:100%;
+border-radius:10px;
+}
+
+@keyframes fade{
+from{opacity:0; transform:translateY(10px)}
+to{opacity:1; transform:translateY(0)}
+}
+
+/* BUTTONS */
+
+button{
+padding:8px 15px;
+border:none;
+border-radius:20px;
+color:white;
+cursor:pointer;
+margin-top:8px;
+font-weight:bold;
+background:linear-gradient(45deg,#ff512f,#dd2476);
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.1);
+background:linear-gradient(45deg,#36d1dc,#5b86e5);
+}
+
+/* INPUT */
+
+input{
+padding:8px;
+margin:5px 0;
+width:95%;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
+/* DARK MODE */
+
+.dark{
+background:#121212;
+color:white;
+}
+
+.dark header{
+background:linear-gradient(90deg,#000000,#434343);
+}
+
+.dark .profile,
+.dark .post,
+.dark .stories{
+background:#1e1e1e;
+color:white;
+}
+
+</style>
+
+<script>
+
+function darkMode(){
+document.body.classList.toggle("dark")
+}
+
+function likePost(btn){
+
+let count = btn.nextElementSibling
+count.innerHTML = parseInt(count.innerHTML)+1
+
+}
+
+async function loadPosts(){
+
+let res = await fetch("/get_posts")
+let posts = await res.json()
+
+let feed = document.getElementById("feed")
+feed.innerHTML=""
+
+posts.forEach(p=>{
+
+feed.innerHTML += `
+<div class="post">
+
+<h3>${p.username}</h3>
+
+<img src="${p.image}">
+
+<p>${p.text}</p>
+
+<button onclick="likePost(this)">❤️ Like</button>
+
+<span>0</span>
+
+<br>
+
+<input placeholder="Write comment">
+
+</div>
+`
+
+})
+
+}
+
+async function createPost(){
+
+let username=document.getElementById("username").value
+let text=document.getElementById("text").value
+let image=document.getElementById("image").value
+
+await fetch("/add_post",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({username,text,image})
+
+})
+
+loadPosts()
+
+}
+
+window.onload = loadPosts
+
+</script>
+
+</head>
+
+<body>
+
+<header>
+
+<h2>🌐 MySocial</h2>
+
+<nav>
+<a href="#">Home</a>
+<a href="#">Profile</a>
+<a href="#">Messages</a>
+</nav>
+
+<button onclick="darkMode()">🌙 Dark</button>
+
+</header>
+
+<div class="container">
+
+<div class="profile">
+
+<img src="https://via.placeholder.com/100">
+
+<h3>Aman</h3>
+
+<p>Followers:120</p>
+<p>Following:80</p>
+
+</div>
+
+<div>
+
+<h3>Create Post</h3>
+
+<input id="username" placeholder="Your Name">
+
+<input id="text" placeholder="Write something">
+
+<input id="image" placeholder="Image URL">
+
+<button onclick="createPost()">Post</button>
+
+<hr>
+
+<div id="feed"></div>
+
+</div>
+
+<div class="stories">
+
+<h3>Stories</h3>
+
+<div class="story">Aman</div>
+<div class="story">Rahul</div>
+<div class="story">Priya</div>
+<div class="story">Sneha</div>
+
+</div>
+
+</div>
+
+</body>
+</html>
